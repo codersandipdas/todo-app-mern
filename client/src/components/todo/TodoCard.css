@@ -1,0 +1,7 @@
+.todo__title {
+  flex: 1;
+}
+.toto__action__btns {
+  flex: 0 0 1;
+  gap: 10px;
+}
