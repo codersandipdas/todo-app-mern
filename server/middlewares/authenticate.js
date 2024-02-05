@@ -1,14 +1,13 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 const authenticate = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
 
   if (token == null) {
-    //return res.sendStatus(401);
     return res.status(401).json({
       status: false,
-      message: 'Unauthorized',
+      message: "Unauthorized",
       auth: false,
     });
   }
@@ -17,7 +16,7 @@ const authenticate = (req, res, next) => {
     if (err) {
       return res.status(403).json({
         status: false,
-        message: 'Invalid token',
+        message: "Invalid token",
         auth: false,
       });
     }
