@@ -7,7 +7,7 @@ const authenticate = require("../middlewares/authenticate");
 // Create new todo
 router.post(
   "/",
-  [body("title").notEmpty().withMessage("Title is required")],
+  [body("title").trim().notEmpty().withMessage("Title is required")],
   authenticate,
   async (req, res) => {
     const { title } = req.body;
@@ -122,7 +122,7 @@ router.put(
       const response = await Todo.findOneAndUpdate(
         { _id: id, userId: userId },
         { title, isCompleted },
-        { new: true } // this will return the updaed document
+        { new: true } // this will return the updated document
       );
 
       return res.status(200).json({

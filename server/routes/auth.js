@@ -92,9 +92,20 @@ router.post(
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
         expiresIn: "2h",
       });
-      return res
-        .status(200)
-        .json({ status: true, token, message: "Logged in successfully" });
+
+      // Set the token in an HttpOnly cookie
+      res.cookie("token", token, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 2 hours in milliseconds
+        secure: true,
+        path: "/",
+      });
+
+      return res.status(200).json({
+        status: true,
+        user: { email: user.email, _id: user._id },
+        message: "Logged in successfully",
+      });
     } catch (err) {
       return res
         .status(500)
@@ -106,6 +117,12 @@ router.post(
 // Verify token
 router.get("/verify", authenticate, async (req, res) => {
   return res.status(200).json({ status: true, auth: true });
+});
+
+// logout
+router.get("/logout", (req, res) => {
+  res.clearCookie("token", { httpOnly: true });
+  return res.status(200).json({ status: true, message: "Logout successfull" });
 });
 
 module.exports = router;

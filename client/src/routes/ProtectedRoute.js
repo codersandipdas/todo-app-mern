@@ -1,30 +1,34 @@
-import React, { useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import axiosInstance from "../services/axiosInstance";
 
 export const ProtectedRoute = ({ children }) => {
-  const { token, handleLogout } = useAuth();
+  const { user, handleLogout } = useAuth();
+  const [isLoading, setIsLaoding] = useState(true);
 
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        await axios.get(
-          `${process.env.REACT_APP_API_AUTH}/api/v1/auth/verify`,
-          {
-            headers: { authorization: `Bearer ${token}` },
-          }
-        );
+        await axiosInstance.get(`/api/v1/auth/verify`);
+        setIsLaoding(false);
       } catch (err) {
-        !err.response.data.auth && handleLogout();
+        const { status } = err.response;
+        if (status === 401 || status === 403) {
+          handleLogout();
+        }
       }
     };
 
-    token && verifyToken();
-  }, [token, handleLogout]);
+    user && verifyToken();
+  }, [user, handleLogout]);
 
-  if (!token) {
-    return <Navigate to='/login' />;
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
   return children;
 };
