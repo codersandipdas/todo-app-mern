@@ -96,7 +96,7 @@ router.post(
       // Set the token in an HttpOnly cookie
       res.cookie("token", token, {
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 2 hours in milliseconds
+        maxAge: 365 * 24 * 60 * 60 * 1000, // 365 days in milliseconds
         secure: true,
         path: "/",
       });
