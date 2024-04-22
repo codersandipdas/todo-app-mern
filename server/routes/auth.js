@@ -89,9 +89,13 @@ router.post(
       // Generate JWT token
       // for simplicity and demo purpose we are using secret,
       // we should use key pair for a production grade app
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "2h",
-      });
+      const token = jwt.sign(
+        { userId: user._id, email: user.email },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "6h",
+        }
+      );
 
       // Set the token in an HttpOnly cookie
       res.cookie("token", token, {
@@ -103,7 +107,7 @@ router.post(
 
       return res.status(200).json({
         status: true,
-        user: { email: user.email, _id: user._id },
+        user: { email: user.email, userId: user._id },
         message: "Logged in successfully",
       });
     } catch (err) {
@@ -116,7 +120,25 @@ router.post(
 
 // Verify token
 router.get("/verify", authenticate, async (req, res) => {
-  return res.status(200).json({ status: true, auth: true });
+  const user = req.user;
+  delete user.exp;
+  delete user.iat;
+
+  const token = jwt.sign(user, process.env.JWT_SECRET, {
+    expiresIn: "6h",
+  });
+
+  // Set the token in an HttpOnly cookie
+  res.cookie("token", token, {
+    httpOnly: true,
+    maxAge: 365 * 24 * 60 * 60 * 1000, // 365 days in milliseconds
+    secure: true,
+    path: "/",
+  });
+
+  return res
+    .status(200)
+    .json({ status: true, user, message: "User verified successfully" });
 });
 
 // logout
