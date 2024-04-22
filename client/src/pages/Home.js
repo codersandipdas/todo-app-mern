@@ -23,13 +23,13 @@ const Home = () => {
         setTodos(response.data.todos);
         setTotalPages(response.data.totalPages);
         setCurrentPage(response.data.currentPage);
-        setLoading(false);
       } catch (error) {
-        setLoading(false);
         const { status } = error.response;
         if (status === 401 || status === 403) {
           handleLogout();
         }
+      } finally {
+        setLoading(false);
       }
     };
 
